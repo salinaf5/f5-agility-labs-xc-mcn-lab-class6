@@ -345,7 +345,7 @@ In the next lab, you'll explore App Connect for application-level connectivity u
 
 **End of Lab 2**
 
-.. |lab001| image:: ../images/temp/lab2/lab2-overview.png
+.. |lab001| image:: ../images/temp/lab2/lab2pic1.png
    :width: 800px
 .. |lab002| image:: ../images/temp/lab2/lab2pic2.png
    :width: 800px
