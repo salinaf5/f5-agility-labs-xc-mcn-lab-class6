@@ -22,9 +22,7 @@ Prerequisite
 ------------
 
 .. note::
-   You should already be logged into your lab's Distributed Cloud Tenant and have completed Lab 1, 
-   Lab 2, and Lab 3.
-
+   You really should have completed Lab 3 at this point, if not, then I don't know what you have been doing this whole time 🙃 
 
 Task 1: Understanding the Lab Environment
 ------------------------------------------
@@ -37,7 +35,7 @@ you will use App Connect proxies instead of Network Connect routing.
 
 **Lab Environment Overview:**
 
-* AWS and Azure workloads both use **10.0.3.253** (IP overlap)
+* AWS and Azure workloads both use **10.0.5.253** (IP overlap)
 * App Connect will use CE Nodes as proxies to overcome IP overlap
 * Internal load balancers will provide secure connectivity
 * Service Policies will enforce allowed traffic
@@ -83,7 +81,7 @@ Azure workload.
 
 **Configure VIP Advertisement:**
 
-7. Scroll down to **Other Settings** section.
+7. Scroll all the way down to **Other Settings** section.
 
 8. Under **VIP Advertisement**, click the dropdown and select **Custom**.
 
@@ -124,7 +122,7 @@ Now let's test the internal load balancer you just created.
 
 14. Test without domain name:
 
-    **curl http://10.1.1.5**
+    **curl --head 10.1.1.5**
 
     |lab008|
 
@@ -139,9 +137,6 @@ Now let's test the internal load balancer you just created.
     **curl --head http://<your-namespace>-backend-vip-to-azure.lab-mcn.f5demos.com --resolve <your-namespace>-backend-vip-to-azure.lab-mcn.f5demos.com:80:10.1.1.5**
 
     |lab009|
-
-    .. note::
-       On macOS use Cmd + V to paste. On Windows use Shift + Insert to paste into the web shell.
 
 16. You should now receive a **200 OK** response!
 
@@ -184,13 +179,13 @@ privately over port 80. To test this, you will use a diagnostic tool running on 
     Variable                          Value
     ================================  ========================================
     Select Type of Origin Server      IP address of Origin Server on given Sites
-    IP                                10.0.3.253
+    IP                                10.0.5.253
     Site or Virtual Site              Site
-    Site                              system/student-awsnet
-    Select Network on the site        Inside Network
+    Site                              system/appworld-aws
+    Select Network on the site        Outside Network
     ================================  ========================================
 
-23. Click **Apply** and then **Save and Exit**.
+23. Click **Apply** and then **Add Origin Pool**.
 
     |lab012|
 
@@ -219,7 +214,7 @@ Task 5: Create HTTP Load Balancer for Diagnostic Tool
 
     |lab013|
 
-29. Click **Save and Exit**.
+29. Click **Add HTTP Load Balancer**.
 
 30. Open a new browser tab and navigate to:
 
@@ -257,7 +252,7 @@ Now you'll create an internal load balancer in AWS that connects to Azure.
 
 **Configure VIP Advertisement:**
 
-36. Scroll down to **VIP Advertisement** and select **Custom**.
+36. Scroll all the way down to **VIP Advertisement** and select **Custom**.
 
 37. Click **Configure**.
 
@@ -270,7 +265,7 @@ Now you'll create an internal load balancer in AWS that connects to Azure.
     ================================  ========================================
     Select Where to Advertise         Site
     Site Network                      Inside
-    Site Reference                    system/student-awsnet
+    Site Reference                    system/appworld-aws
     TCP Listen Port Choice            TCP Listen Port
     TCP Listen Port                   80
     ================================  ========================================
@@ -303,13 +298,13 @@ Let's test the connectivity between AWS and Azure through the internal load bala
     |lab017|
 
     .. note::
-       In this example, the inside interface IP is **10.0.5.15**. Your IP may differ.
+       In this example, the inside interface IP is **10.0.5.16*. Your IP may differ.
 
 46. Go to the diagnostic tool: **http://<your-namespace>-awstool.lab-mcn.f5demos.com**
 
 47. Click **Run Command** and paste the following:
 
-    **curl http://<your-namespace>-aws-to-azure-lb.lab-mcn.f5demos.com --resolve <your-namespace>-aws-to-azure-lb.lab-mcn.f5demos.com:80:10.0.5.15**
+    **curl http://<your-namespace>-aws-to-azure-lb.lab-mcn.f5demos.com --resolve <your-namespace>-aws-to-azure-lb.lab-mcn.f5demos.com:80:10.0.5.16**
 
     |lab018|
 
@@ -317,181 +312,13 @@ Let's test the connectivity between AWS and Azure through the internal load bala
 
 48. Test again with the **--head** flag:
 
-    **curl --head http://<your-namespace>-aws-to-azure-lb.lab-mcn.f5demos.com --resolve <your-namespace>-aws-to-azure-lb.lab-mcn.f5demos.com:80:10.0.5.15**
+    **curl --head http://<your-namespace>-aws-to-azure-lb.lab-mcn.f5demos.com --resolve <your-namespace>-aws-to-azure-lb.lab-mcn.f5demos.com:80:10.0.5.16**
 
     |lab019|
 
     .. tip::
        You now have full proxy connectivity between IP-overlapped AWS and Azure resources over 
        a private encrypted tunnel!
-
-Task 8: Understanding Service Policies
----------------------------------------
-
-**Adding Security Requirements:**
-
-ACME Corp requires that the Azure API be "Read Only" for clients originating from AWS. You will 
-use Service Policies to enforce specific HTTP methods.
-
-**Key Concepts:**
-
-* **Service Policies:** Control access based on multiple criteria (HTTP methods, geolocation, IPs, etc.)
-* **Default Deny:** Service Policies have implicit deny - you define what is allowed
-* **HTTP Methods:** GET, POST, PUT, HEAD, DELETE, etc.
-
-.. note::
-   For this lab, we will pretend that GET is read-only and HEAD is read-write. In practice, 
-   HEAD is similar to GET but without a response body.
-
-Task 9: Create Service Policy
-------------------------------
-
-You will create a Service Policy that only allows the GET HTTP method.
-
-49. Navigate to **Security >> Service Policies >> Service Policies**.
-
-50. Click **Add Service Policy**.
-
-51. Configure the service policy:
-
-    ================================  ========================================
-    Variable                          Value
-    ================================  ========================================
-    Name                              <your-namespace>-allow-get-sp
-    Server Selection                  Server Name
-    Server Name                       <your-namespace>-aws-to-azure-lb.lab-mcn.f5demos.com
-    Select Policy Rules               Custom Rule List
-    ================================  ========================================
-
-52. Under **Rules**, click **Configure**.
-
-53. Click **Add Item**.
-
-**Configure Rule:**
-
-54. Configure the rule:
-
-    ================================  ========================================
-    Variable                          Value
-    ================================  ========================================
-    Name                              allow-get
-    Action                            Allow
-    Clients                           Any Client
-    Servers                           Domain Matcher >> Exact Value >> <your-namespace>-aws-to-azure-lb.lab-mcn.f5demos.com
-    HTTP Method/Method List           Get
-    ================================  ========================================
-
-55. Under **HTTP Path**, click **Configure**.
-
-56. Click **Add Item** and add **/** under **Prefix Values**.
-
-    |lab020|
-
-57. Click **Apply**.
-
-    |lab021|
-
-58. Click **Apply**.
-
-    |lab022|
-
-59. Click **Apply**.
-
-    |lab023|
-
-60. Click **Save and Exit**.
-
-Task 10: Apply Service Policy to Load Balancer
------------------------------------------------
-
-Now let's apply the Service Policy to the AWS-to-Azure load balancer.
-
-61. Navigate to **Manage >> Load Balancers >> HTTP Load Balancers**.
-
-62. Click the three dots under **Actions** for **<your-namespace>-aws-to-azure-lb**.
-
-63. Select **Manage Configuration**.
-
-64. Click **Edit Configuration**.
-
-65. Scroll down to **Common Security Controls**.
-
-66. Under **Service Policies**, select **Apply Specified Service Policies**.
-
-67. Click **Configure**.
-
-68. Select **<your-namespace>-allow-get-sp**.
-
-69. Click **Apply** and then **Save and Exit**.
-
-    |lab024|
-
-Task 11: Test Service Policy Enforcement
------------------------------------------
-
-Let's verify that the Service Policy is working correctly.
-
-70. Go to the diagnostic tool: **http://<your-namespace>-awstool.lab-mcn.f5demos.com**
-
-71. Test GET method (should work):
-
-    **curl http://<your-namespace>-aws-to-azure-lb.lab-mcn.f5demos.com --resolve <your-namespace>-aws-to-azure-lb.lab-mcn.f5demos.com:80:10.0.5.15**
-
-    |lab025|
-
-    You should receive a **200 OK** response.
-
-72. Test HEAD method (should be blocked):
-
-    **curl --head http://<your-namespace>-aws-to-azure-lb.lab-mcn.f5demos.com --resolve <your-namespace>-aws-to-azure-lb.lab-mcn.f5demos.com:80:10.0.5.15**
-
-    |lab026|
-
-    You should receive a **403 Forbidden** response.
-
-    .. tip::
-       The Service Policy is now enforcing that only GET requests are allowed. All other HTTP 
-       methods are denied.
-
-Task 12: Review Service Policy Logs
-------------------------------------
-
-Let's review the request logs to see the Service Policy in action.
-
-73. Navigate to **Multi-Cloud App Connect >> Overview >> Applications**.
-
-74. Scroll down and click on **<your-namespace>-aws-to-azure-lb** under **Load Balancers**.
-
-    |lab027|
-
-75. Click on the **Requests** tab at the top of the page.
-
-    |lab028|
-
-    .. tip::
-       If you don't see recent data, click refresh or adjust the time frame.
-
-76. Click the settings gear icon on the right to add **Response Code** to the columns.
-
-    |lab029|
-
-77. **Expand** a log entry with a **403** response code (blocked HEAD requests).
-
-78. Review the request data and identify the policy that was applied and the result.
-
-    |lab030|
-
-    .. note::
-       These 403 responses show that the Service Policy blocked the HEAD requests as expected.
-
-79. **Expand** a log entry with a **200** response code (allowed GET requests).
-
-80. Review the request data and identify the policy that was applied and the result.
-
-    |lab031|
-
-    .. note::
-       These 200 responses show that the Service Policy allowed the GET requests as expected.
 
 Lab Summary
 -----------

@@ -25,25 +25,25 @@ Prerequisite
 .. note::
   We are going to de-attach the aws segment that we attached to our CE in Lab 2, because we now need connectivity to both AWS and Azure site.
 
-1. Navigate to **Multi-Cloud Network Connect >> Manage >> Site Management >> Secure Mesh Site v2**.
+0.1. Navigate to **Multi-Cloud Network Connect >> Manage >> Site Management >> Secure Mesh Site v2**.
 
-2. Click on **Manage Configuration** for the **<your-namespace>-site**.
+0.2. Click on **Manage Configuration** for the **<your-namespace>-site**.
 
    |lab001.1|
 
-3. Click **Edit Configuration** on the top right.
+0.3. Click **Edit Configuration** on the top right.
 
    |lab001.2|
 
-4. **Edit** (the pencil icon) for your Control node.
+0.4. **Edit** (the pencil icon) for your Control node.
 
    |lab001.3|
 
-5. **Edit** (the pencil icon) for the **enp0s6** interface.
+0.5. **Edit** (the pencil icon) for the **enp0s6** interface.
 
    |lab001.4|
 
-6. Configure your interface then click **Apply**:
+0.6. Configure your interface then click **Apply**:
 
     **IP Configuration:**
 
@@ -63,13 +63,17 @@ Prerequisite
 
    |lab001.5|
 
-7. Click **Apply** to save interface changes for your Control Node.
+0.7. Click **Apply** to save interface changes for your Control Node.
 
    |lab001.6|
 
-8. Click **Save Secure Mesh Site** at the bottom of the page to apply changes to the site and CE node.
+0.8. Click **Save Secure Mesh Site** at the bottom of the page to apply changes to the site and CE node.
 
    |lab001.7|
+
+0.9 [Intrstructor's Action Item] Set the AWS CE interface that's currently attached to appworld-aws segment to SLI (Site Local Inside).
+
+   |lab001.8|
 
 Task 1: Understanding App Connect
 ----------------------------------
@@ -525,6 +529,8 @@ challenges.
 .. |lab001.6| image:: ../images/temp/lab3/lab3pic0.6.png
    :width: 800px
 .. |lab001.7| image:: ../images/temp/lab3/lab3pic0.7.png
+   :width: 800px
+.. |lab001.8| image:: ../images/temp/lab3/lab3pic0.8.png
    :width: 800px
 .. |lab002| image:: ../images/temp/lab3/lab3pic1.png
    :width: 800px
