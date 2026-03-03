@@ -23,7 +23,53 @@ Prerequisite
 ------------
 
 .. note::
-   You should already be logged into your lab's Distributed Cloud Tenant and have completed Lab 1 and Lab 2.
+  We are going to de-attach the aws segment that we attached to our CE in Lab 2, because we now need connectivity to both AWS and Azure site.
+
+1. Navigate to **Multi-Cloud Network Connect >> Manage >> Site Management >> Secure Mesh Site v2**.
+
+2. Click on **Manage Configuration** for the **<your-namespace>-site**.
+
+   |lab001.1|
+
+3. Click **Edit Configuration** on the top right.
+
+   |lab001.2|
+
+4. **Edit** (the pencil icon) for your Control node.
+
+   |lab001.3|
+
+5. **Edit** (the pencil icon) for the **enp0s6** interface.
+
+   |lab001.4|
+
+6. Configure your interface then click **Apply**:
+
+    **IP Configuration:**
+
+    ================================  ========================================
+    Variable                          Value
+    ================================  ========================================
+    IPv4 Interface Address Method     DHCP Client
+    ================================  ========================================
+
+    **Interface Settings:**
+
+    ================================  ========================================
+    Variable                          Value
+    ================================  ========================================
+    Select VRF                        Site Local Inside (Local VRF)
+    ================================  ========================================
+
+   |lab001.5|
+
+7. Click **Apply** to save interface changes for your Control Node.
+
+   |lab001.6|
+
+8. Click **Save Secure Mesh Site** at the bottom of the page to apply changes to the site and CE node.
+
+   |lab001.7|
 
 Task 1: Understanding App Connect
 ----------------------------------
@@ -118,7 +164,7 @@ You will now create an origin pool for the AWS workload using a public DNS name.
 
     |lab011|
 
-14. Click **Save Origin Pool**.
+14. Click **Add Origin Pool**.
 
 Task 4: Create Azure Origin Pool
 ---------------------------------
@@ -150,7 +196,7 @@ You will now create an origin pool for the Azure workload using a private IP add
     ================================  ========================================
     Variable                          Value
     ================================  ========================================
-    IP                                10.0.3.253
+    IP                                10.0.5.253
     Site or Virtual Site              Site
     Site                              system/appworld-azure
     Select Network on the site        Inside Network
@@ -159,7 +205,7 @@ You will now create an origin pool for the Azure workload using a private IP add
     |lab014|
 
     .. note::
-       The IP address 10.0.3.253 is the same as in earlier labs. This demonstrates how App Connect
+       The IP address 10.0.5.253 is the same as in earlier labs. This demonstrates how App Connect
        handles IP overlap between sites.
 
 20. Change the **Origin Server Port** to **80**.
@@ -296,7 +342,7 @@ Let's simulate an AWS failure to test failover to the Azure pool.
        Enabling TLS will cause the health check to fail because the AWS server doesn't expect
        TLS. This simulates an AWS workload failure.
 
-46. Wait approximately 30-60 seconds for the health check to fail.
+46. Wait approximately 10 - 15 seconds for the health check to fail.
 
 47. Go back to your browser tab and refresh:
 
@@ -361,7 +407,7 @@ Now let's explore the analytics and monitoring capabilities.
 
     |lab036|
 
-59. Review the **Application Health** score. It's not 100% due to the AWS pool being
+59. Review the **Application Health** score. It shouldn't be 100% due to the AWS pool being
     offline during testing.
 
     |lab037|
@@ -465,6 +511,20 @@ challenges.
 **End of Lab 3**
 
 .. |lab001| image:: ../images/temp/lab3/lab3pic0.png
+   :width: 800px
+.. |lab001.1| image:: ../images/temp/lab3/lab3pic0.1.png
+   :width: 800px
+.. |lab001.2| image:: ../images/temp/lab3/lab3pic0.2.png
+   :width: 800px
+.. |lab001.3| image:: ../images/temp/lab3/lab3pic0.3.png
+   :width: 800px
+.. |lab001.4| image:: ../images/temp/lab3/lab3pic0.4.png
+   :width: 800px
+.. |lab001.5| image:: ../images/temp/lab3/lab3pic 0.5.png
+   :width: 800px
+.. |lab001.6| image:: ../images/temp/lab3/lab3pic0.6.png
+   :width: 800px
+.. |lab001.7| image:: ../images/temp/lab3/lab3pic0.7.png
    :width: 800px
 .. |lab002| image:: ../images/temp/lab3/lab3pic1.png
    :width: 800px
